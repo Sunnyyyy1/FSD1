@@ -2,10 +2,138 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Marks System</title>
-    <link rel="stylesheet" href="style.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #fff);
+            margin: 0;
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            margin: 0 auto 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 750px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #eee;
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background: #3498db;
+            border: none;
+            color: #fff;
+            padding: 10px 16px;
+            margin: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #2c80b4;
+            transform: translateY(-1px);
+        }
+
+        .add-form {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .add-form input {
+            padding: 10px 12px;
+            margin: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 160px;
+            max-width: 90%;
+            transition: border 0.3s;
+        }
+
+        .add-form input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .add-form button {
+            background: #2ecc71;
+        }
+
+        .add-form button:hover {
+            background: #27ae60;
+        }
+
+        #msg {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            font-size: 16px;
+            background: #ecf0f1;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 600px) {
+
+            table,
+            th,
+            td {
+                font-size: 14px;
+            }
+
+            .add-form input {
+                width: 90%;
+                margin-bottom: 10px;
+            }
+
+            .btn-group button {
+                width: 90%;
+                margin: 8px auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -14,8 +142,8 @@
     <table id="studentTable">
         <thead>
             <tr>
-                <th>Select</th>
                 <th>Name</th>
+                <th>Subject</th>
                 <th>Marks</th>
             </tr>
         </thead>
@@ -25,22 +153,120 @@
     <div class="btn-group">
         <button id="showHighestBtn">Show Highest</button>
         <button id="showAverageBtn">Show Average</button>
-        <button id="averageSelectedBtn">Average of Selected students</button>
         <button id="sortBtn">Sort by Marks</button>
         <button id="removeBtn">Remove Last</button>
         <button id="resetBtn">Reset Sample</button>
     </div>
 
     <div class="add-form">
-        <input id="newName" placeholder="Student name" />
-        <input id="newMarks" type="number" placeholder="Marks (0-100)" />
+        <input id="newName" placeholder="Student name">
+        <input id="newSubject" placeholder="Subject">
+        <input id="newMarks" type="number" placeholder="Marks (0-100)">
         <button id="addStudentBtn">Add Student</button>
-        <div class="form-error" id="formError"></div>
     </div>
 
     <div id="msg"></div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let students = [
+                { name: "Divya", subject: "Math", marks: 98 },
+                { name: "Karan", subject: "Science", marks: 95 },
+                { name: "Priya", subject: "English", marks: 92 },
+                { name: "Sneha", subject: "Math", marks: 88 },
+                { name: "Amit", subject: "Science", marks: 85 },
+                { name: "Rahul", subject: "English", marks: 76 }
+            ];
+
+            const tbody = document.querySelector('#studentTable tbody');
+            const msg = document.getElementById('msg');
+
+            function renderTable() {
+                tbody.innerHTML = '';
+                students.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${s.name}</td><td>${s.subject}</td><td>${s.marks}</td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function showHighest() {
+                if (!students.length) {
+                    msg.textContent = 'No students';
+                    return;
+                }
+                const max = students.reduce((a, b) => a.marks > b.marks ? a : b);
+                msg.textContent = `Highest: ${max.name} (${max.subject}) - ${max.marks}`;
+            }
+
+            function showAverage() {
+                if (!students.length) {
+                    msg.textContent = 'No students';
+                    return;
+                }
+                const avg = students.reduce((sum, s) => sum + s.marks, 0) / students.length;
+                msg.textContent = `Average Marks: ${avg.toFixed(2)}`;
+            }
+
+            function sortByMarks() {
+                students.sort((a, b) => b.marks - a.marks);
+                renderTable();
+                msg.textContent = 'Sorted by marks (highest → lowest)';
+            }
+
+            function removeLast() {
+                if (!students.length) {
+                    msg.textContent = 'No students to remove';
+                    return;
+                }
+                students.pop();
+                renderTable();
+                msg.textContent = 'Removed last student';
+            }
+
+            function addStudent() {
+                const name = document.getElementById('newName').value.trim();
+                const subject = document.getElementById('newSubject').value.trim();
+                const marks = parseInt(document.getElementById('newMarks').value, 10);
+
+                if (!name || !subject || Number.isNaN(marks) || marks < 0 || marks > 100) {
+                    alert('Enter valid name, subject, and marks between 0 and 100');
+                    return;
+                }
+
+                students.push({ name, subject, marks });
+                document.getElementById('newName').value = '';
+                document.getElementById('newSubject').value = '';
+                document.getElementById('newMarks').value = '';
+                renderTable();
+                msg.textContent = `Added ${name} (${subject})`;
+            }
+
+            function resetSample() {
+                students = [
+                    { name: "Divya", subject: "Math", marks: 98 },
+                    { name: "Karan", subject: "Science", marks: 95 },
+                    { name: "Priya", subject: "English", marks: 92 },
+                    { name: "Sneha", subject: "Math", marks: 88 },
+                    { name: "Amit", subject: "Science", marks: 85 },
+                    { name: "Rahul", subject: "English", marks: 76 }
+                ];
+                renderTable();
+                msg.textContent = '';
+            }
+
+            // Event Listeners
+            document.getElementById('showHighestBtn').addEventListener('click', showHighest);
+            document.getElementById('showAverageBtn').addEventListener('click', showAverage);
+            document.getElementById('sortBtn').addEventListener('click', sortByMarks);
+            document.getElementById('removeBtn').addEventListener('click', removeLast);
+            document.getElementById('addStudentBtn').addEventListener('click', addStudent);
+            document.getElementById('resetBtn').addEventListener('click', resetSample);
+
+            // Initial render
+            renderTable();
+        });
+    </script>
 </body>
 
 </html>
