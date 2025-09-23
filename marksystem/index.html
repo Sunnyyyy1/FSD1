@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Marks System</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <h2>Student Marks System</h2>
+
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Marks</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="btn-group">
+        <button id="showHighestBtn">Show Highest</button>
+        <button id="showAverageBtn">Show Average</button>
+        <button id="averageSelectedBtn">Average of Selected students</button>
+        <button id="sortBtn">Sort by Marks</button>
+        <button id="removeBtn">Remove Last</button>
+        <button id="resetBtn">Reset Sample</button>
+    </div>
+
+    <div class="add-form">
+        <input id="newName" placeholder="Student name" />
+        <input id="newMarks" type="number" placeholder="Marks (0-100)" />
+        <button id="addStudentBtn">Add Student</button>
+        <div class="form-error" id="formError"></div>
+    </div>
+
+    <div id="msg"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

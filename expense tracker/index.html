@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #28a745;
+            /* green */
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+            width: 100%;
+            /* full length */
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #28a745;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #a71d2a;
+        }
+
+        #total {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            color: #333;
+        }
+
+        .search-section {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-section input,
+        .search-section button {
+            width: auto;
+            flex: 1;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Expense Tracker</h2>
+
+
+        <label for="ename">Expense Name</label>
+        <input type="text" id="ename" placeholder="e.g. Groceries">
+
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" placeholder="e.g. 500">
+
+        <label for="desc">Description</label>
+        <input type="text" id="desc" placeholder="e.g. Bought fruits and vegetables">
+
+        <label for="date">Date</label>
+        <input type="date" id="date">
+
+        <button onclick="addExpense()">Add Expense</button>
+
+
+        <div class="search-section">
+            <input type="text" id="searchName" placeholder="Search by Name">
+            <input type="date" id="searchDate">
+
+        </div>
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTable"></tbody>
+        </table>
+
+        <p id="total">Total: ₹0</p>
+    </div>
+
+    <script>
+        let expenses = [];
+        let total = 0;
+
+        function formatDate(dateStr) {
+            let [year, month, day] = dateStr.split("-");
+            return ${ day } -${ month } -${ year };
+        }
+
+        function addExpense() {
+            let name = document.getElementById("ename").value;
+            let amount = parseFloat(document.getElementById("amount").value);
+            let desc = document.getElementById("desc").value;
+            let date = document.getElementById("date").value;
+
+            if (!name || !amount || !date) {
+                alert("Please fill in Name, Amount, and Date.");
+                return;
+            }
+
+            let expense = { name, amount, desc, date };
+            expenses.push(expense);
+            renderTable(expenses);
+
+            document.getElementById("ename").value = "";
+            document.getElementById("amount").value = "";
+            document.getElementById("desc").value = "";
+            document.getElementById("date").value = "";
+        }
+
+        function renderTable(data) {
+            let table = document.getElementById("expenseTable");
+            table.innerHTML = "";
+            total = 0;
+
+            data.forEach((expense, index) => {
+                let row = table.insertRow();
+
+                row.insertCell(0).innerText = expense.name;
+                row.insertCell(1).innerText = "₹" + expense.amount;
+                row.insertCell(2).innerText = expense.desc;
+                row.insertCell(3).innerText = formatDate(expense.date);
+
+                let actionCell = row.insertCell(4);
+                let btn = document.createElement("button");
+                btn.innerText = "Delete";
+                btn.classList.add("delete-btn");
+                btn.onclick = function () {
+                    expenses.splice(index, 1);
+                    renderTable(expenses);
+                };
+                actionCell.appendChild(btn);
+
+                total += expense.amount;
+            });
+
+            document.getElementById("total").innerText = "Total: ₹" + total;
+        }
+
+        function searchExpenses() {
+            let nameFilter = document.getElementById("searchName").value.toLowerCase();
+            let dateFilter = document.getElementById("searchDate").value;
+
+            // Filter by name AND date
+            let filtered = expenses.filter(expense => {
+                let matchesName = nameFilter ? expense.name.toLowerCase().includes(nameFilter) : true;
+                let matchesDate = dateFilter ? expense.date === dateFilter : true;
+                return matchesName && matchesDate;
+            });
+
+            renderTable(filtered);
+        }
+
+        function resetSearch() {
+            document.getElementById("searchName").value = "";
+            document.getElementById("searchDate").value = "";
+            renderTable(expenses);
+        }
+
+        // Optional: search as you type or select date
+        document.getElementById("searchName").addEventListener("input", searchExpenses);
+        document.getElementById("searchDate").addEventListener("change", searchExpenses);
+    </script>
+</body>
+
+</html>
